@@ -19,6 +19,7 @@ var EventEmitter = require('events').EventEmitter
 module.exports = {
   createClient: createClient,
   createServer: createServer,
+  createServerSocket: createServerSocket,
   Client: Client,
   Server: Server,
   ping: require('./lib/ping'),
@@ -26,7 +27,7 @@ module.exports = {
   yggdrasil: Yggdrasil,
 };
 
-function createServer(options) {
+function setupServer(options) {
   options = options || {};
   var port = options.port != null ?
           options.port :
@@ -199,6 +200,25 @@ function createServer(options) {
       server.emit('login', client);
     }
   });
+
+  return server;
+}
+
+function createServerSocket(options) {
+  return setupServer(options);
+}
+
+function createServer(options) {
+  options = options || {};
+  var port = options.port != null ?
+          options.port :
+          options['server-port'] != null ?
+          options['server-port'] :
+          25565;
+  var host = options.host || '0.0.0.0';
+
+  var server = setupServer(options);
+  
   server.listen(port, host);
   return server;
 }
