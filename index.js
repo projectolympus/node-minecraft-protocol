@@ -14,6 +14,7 @@ var EventEmitter = require('events').EventEmitter
         , joinServer = Yggdrasil.joinServer
         , states = protocol.states
         , debug = protocol.debug
+        , nodeuuid = require('node-uuid')
         ;
 
 module.exports = {
@@ -178,14 +179,14 @@ function setupServer(options) {
             client.end("Failed to verify username!");
             return;
           }
-          client.uuid = uuid;
+          client.uuid = nodeuuid.unparse(nodeuuid.parse(uuid));
           loginClient();
         });
       }
     }
 
     function loginClient() {
-      client.write(0x02, {uuid: (client.uuid | 0).toString(10), username: client.username});
+      client.write(0x02, {uuid: client.uuid || '0-0-0-0-0', username: client.username});
       client.state = states.PLAY;
       loggedIn = true;
       startKeepAlive();
